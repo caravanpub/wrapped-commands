@@ -1,0 +1,46 @@
+The wrapper.c file contains main().
+
+The arguments passed to the wrapped executable are copied into a
+new string — any relative paths are changed to absolute. 
+
+For each wrapped command, there exists two sets of rules containing
+PCRE expressions. These are defined in ruledef.c. This is probably
+the only file you will need to edit, i.e. to add rules for your local
+users. ( Look at rule.h for info on flags which change rule behavior )
+
+The string with the expanded arguments is compared to the
+patterns in the rule lists. PCRE expressions are used because
+"look behind" is necessary.
+
+The first rule list describes what is allowed.
+
+The second list describes what is forbidden.
+
+A rule can have flags which allow subsequent processing to
+stop if matched, e.g. to bypass the forbidden rule list, to
+squelch logging, etc...
+
+The set of allowed PCRE patterns should match the entire line and will
+typically need at least one anchor at the beginning and end of the pattern.
+( there may be cases when the anchor for the end of the pattern
+could be optional, but that's not common )
+
+The forbidden patterns can match the entire line, or just part of it — a
+partial match is the more common case. e.g.
+
+(\.){2,}
+
+will find any instances of .. in any argument.
+
+(?<![[:alnum:]])/var/[-_.[:alnum:]]*/(?!FOO)
+
+will insure that one can't use the command on non FOO parts of /var
+but will not match arguments like /home/user/var/log or /var/spool/FOO.
+
+Please note, the ability to use "look behind" and "look ahead" in the second
+example is the primary motivation for using PCRE rather than the
+built-in extended regex functions.
+
+This allows for looser matching of what's allowed, but the following
+forbidden matches reduce the risk that an overly permissive allowed rule.
+
