@@ -48,8 +48,8 @@ regex_rule* apply_rules(list* rules, char* command)
     
     if( (new_cre = pcre_compile( current->subject, PCRE_DUPNAMES | PCRE_UTF8,
 				 &error, &erroroffset, NULL )) == NULL ){
-      syslog(LOG_ERR, "regex compilation error \'%s\' for rule \'%s\' \n", error, current->rulename);
-      fprintf(stderr, "WARNING, regex compilation error. Please contact the system administrator.\n");
+      syslog(LOG_ERR, "regex compilation error \'%s\' for rule \'%s\' \n", error, current->id);
+      fprintf(stderr, "WARNING, regex compilation error of rule %s. Please contact the system administrator.\n", current->id );
       exit(1);
     }
 
